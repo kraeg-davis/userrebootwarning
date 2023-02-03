@@ -1,3 +1,8 @@
+Function Create-GetSchedTime {
+Param(
+$SchedTime
+)
+
 $startwarning = 7 #number of days for when the toast notifications start
 $forcereboot = 14 #number of days before a forced reboot is made
 
@@ -246,10 +251,6 @@ for ($index = 0; $index -lt $notifications.Count; $index++) {
   }
 
 if ($days -gt $forcereboot){
-Function Create-GetSchedTime {
-Param(
-$SchedTime
-)
 $script:StartTime = (Get-Date).AddSeconds($TotalTime)
 $RestartDate = ((get-date).AddSeconds($TotalTime)).AddMinutes(-1)
 $RDate = (Get-Date $RestartDate -f 'dd.MM.yyyy') -replace "\.","/"
@@ -260,19 +261,16 @@ $RTime = Get-Date $RestartDate -f 'HH:mm'
 [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
 [System.Reflection.Assembly]::LoadWithPartialName( "Microsoft.VisualBasic") | Out-Null
 $Title = "HBP Group - Action Required "
-$Message = "Your computer has not been restarted in over 14 days. In order to keep your computer working at top performance it requires a restart. Please save all your work and make the appropriate selections below."
+$Message = "Your computer has not been restarted in over 14 days. In order to keep your computer working at top performance it requires a restart. Please save all your work and select 'Restart now' from below."
 $Message2 = "Please note: Closing this message will not stop the reboot."
 $Button1Text = "Restart now"
-$Button2Text = "Postpone for 1 hour"
-$Button3Text = "Postpone for 2 hours"
 $Form = $null
-$Button1 = $null
-$Button2 = $null
+git
 $Label = $null
 $TextBox = $null
 $Result = $null
 $timerUpdate = New-Object 'System.Windows.Forms.Timer'
-$TotalTime = 1800 #in seconds
+$TotalTime = 3600 #in seconds
 Create-GetSchedTime -SchedTime $TotalTime
 $timerUpdate_Tick={
 # Define countdown timer
@@ -313,13 +311,13 @@ catch [Exception]
 # Form
 $Form = New-Object -TypeName System.Windows.Forms.Form
 $Form.Text = $Title
-$Form.Size = New-Object -TypeName System.Drawing.Size(700,400)
+$Form.ClientSize = '584, 331'
 $Form.StartPosition = "CenterScreen"
 $Form.ControlBox = $False
 $Form.Topmost = $true
 $Form.KeyPreview = $true
 $Form.ShowInTaskbar = $Formalse
-$Form.FormBorderStyle = "FixedDialog"
+$Form.FormBorderStyle = 'None'
 $Form.MaximizeBox = $Formalse
 $Form.MinimizeBox = $Formalse
 $Icon = [system.drawing.icon]::ExtractAssociatedIcon("c:\Windows\System32\UserAccountControlSettings.exe")
@@ -327,8 +325,8 @@ $Form.Icon = $Icon
 
 # Button One (Reboot/Shutdown Now)
 $Button1 = New-Object -TypeName System.Windows.Forms.Button
-$Button1.Size = New-Object -TypeName System.Drawing.Size(200,25)
-$Button1.Location = New-Object -TypeName System.Drawing.Size(10,300)
+$Button1.Size = '551, 48'
+$Button1.Location = '12, 271'
 $Button1.Text = $Button1Text
 $Button1.Font = 'Tahoma, 10pt'
 $Button1.Add_Click({
@@ -354,29 +352,31 @@ $timerUpdate.Start()
 
 # Label
 $Label = New-Object -TypeName System.Windows.Forms.Label
-$Label.Size = New-Object -TypeName System.Drawing.Size(650,70)
-$Label.Location = New-Object -TypeName System.Drawing.Size(10,10)
+$Label.Size = '551, 78'
+$Label.Location = '12, 9'
 $Label.Text = $Message
-$label.Font = 'Tahoma, 10pt'
+$label.Font = "Tahoma, 12pt"
+$label.TextAlign = 'MiddleCenter'
 $Form.Controls.Add($Label)
 
 # Label2
 $Label2 = New-Object -TypeName System.Windows.Forms.Label
-$Label2.Size = New-Object -TypeName System.Drawing.Size(650,200)
-$Label2.Location = New-Object -TypeName System.Drawing.Size(420,500)
+$Label2.Size = '551, 26'
+$Label2.Location = '12, 87'
 $Label2.Text = $Message2
-$label2.Font = 'Tahoma, 10pt'
+$label2.Font = "Tahoma, 12pt, style=Bold"
+$label2.TextAlign = 'MiddleCenter'
+$Label2.ForeColor = 'Red'
 $Form.Controls.Add($Label2)
 
 # labelTime
 $labelTime = New-Object 'System.Windows.Forms.Label'
-$labelTime.AutoSize = $True
-$labelTime.Font = 'Arial, 60pt, style=Bold'
-$labelTime.Location = '200, 80'
+$labelTime.Font = "Tahoma, 72pt"
+$labelTime.Location = '12, 136'
 $labelTime.Name = 'labelTime'
-$labelTime.Size = '43, 15'
+$labelTime.Size = '551, 123'
 $labelTime.TextAlign = 'MiddleCenter'
-$labelTime.ForeColor = '242, 103, 34'
+$labelTime.ForeColor = 'Red'
 $Form.Controls.Add($labelTime)
 
 #Start the timer
