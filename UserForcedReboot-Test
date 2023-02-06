@@ -233,7 +233,11 @@ shutdown /r /f /t 10
 
 
 if ($days -le $startwarning) {
-&schtasks /delete /tn "Post Maintenance Restart" /f | out-null
+	$taskName = "Post Maintenance Restart"
+$taskExists = Get-ScheduledTask | Where-Object {$_.TaskName -like $taskName }	
+		if($taskExists) {
+		&schtasks /delete /tn "Post Maintenance Restart" /f 
+	}
 [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
 
 # get the list of all registry keys
