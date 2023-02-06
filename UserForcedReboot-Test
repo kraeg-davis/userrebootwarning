@@ -1,7 +1,5 @@
 Function Create-GetSchedTime {
-Param(
-$SchedTime
-)
+Param($SchedTime)
 }
 
 $startwarning = 7 #number of days for when the toast notifications start
