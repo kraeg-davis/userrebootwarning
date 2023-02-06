@@ -2,6 +2,7 @@ Function Create-GetSchedTime {
 Param(
 $SchedTime
 )
+}
 
 $startwarning = 7 #number of days for when the toast notifications start
 $forcereboot = 14 #number of days before a forced reboot is made
