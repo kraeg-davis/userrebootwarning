@@ -251,143 +251,354 @@ for ($index = 0; $index -lt $notifications.Count; $index++) {
   }
 
 if ($days -gt $forcereboot){
-$script:StartTime = (Get-Date).AddSeconds($TotalTime)
-$RestartDate = ((get-date).AddSeconds($TotalTime)).AddMinutes(-1)
-$RDate = (Get-Date $RestartDate -f 'dd.MM.yyyy') -replace "\.","/"
-$RTime = Get-Date $RestartDate -f 'HH:mm'
-&schtasks /delete /tn "Post Maintenance Restart" /f
-&schtasks /create /sc once /tn "Post Maintenance Restart" /tr "'C:\Windows\system32\cmd.exe' /c shutdown /r /t 400" /SD $RDate /ST $RTime /f
+#----------------------------------------------
+#region Application Functions
+#----------------------------------------------
+
+function OnApplicationLoad {
+	#Note: This function is not called in Projects
+	#Note: This function runs before the form is created
+	#Note: To get the script directory in the Packager use: Split-Path $hostinvocation.MyCommand.path
+	#Note: To get the console output in the Packager (Windows Mode) use: $ConsoleOutput (Type: System.Collections.ArrayList)
+	#Important: Form controls cannot be accessed in this function
+	#TODO: Add snapins and custom code to validate the application load
+
+	
+	return $true #return true for success or false for failure
+	
+	$taskName = "Post Maintenance Restart"
+$taskExists = Get-ScheduledTask | Where-Object {$_.TaskName -like $taskName }	
+		if($taskExists) {
+		&schtasks /delete /tn "Post Maintenance Restart" /f 
+	}
 }
-[System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
-[System.Reflection.Assembly]::LoadWithPartialName( "Microsoft.VisualBasic") | Out-Null
-$Title = "HBP Group - Action Required "
-$Message = "Your computer has not been restarted in over 14 days. In order to keep your computer working at top performance it requires a restart. Please save all your work and select 'Restart now' from below."
-$Message2 = "Please note: Closing this message will not stop the reboot."
-$Button1Text = "Restart now"
-$Form = $null
-git
-$Label = $null
-$TextBox = $null
-$Result = $null
-$timerUpdate = New-Object 'System.Windows.Forms.Timer'
-$TotalTime = 3600 #in seconds
-Create-GetSchedTime -SchedTime $TotalTime
-$timerUpdate_Tick={
-# Define countdown timer
-[TimeSpan]$span = $script:StartTime - (Get-Date)
-# Update the display
-$hours = "{0:00}" -f $span.Hours
-$mins = "{0:00}" -f $span.Minutes
-$secs = "{0:00}" -f $span.Seconds
-$labelTime.Text = "{0}:{1}:{2}" -f $hours, $mins, $secs
-$timerUpdate.Start()
-if ($span.TotalSeconds -le 0)
+
+function OnApplicationExit {
+	#Note: This function is not called in Projects
+	#Note: This function runs after the form is closed
+	#TODO: Add custom code to clean up and unload snapins when the application exits
+	
+	$script:ExitCode = 0 #Set the exit code for the Packager
+	$timerUpdate.remove_Tick($timerUpdate_Tick)
+}
+
+#endregion Application Functions
+
+#----------------------------------------------
+# Generated Form Function
+#----------------------------------------------
+function Call-RebootWarning_pff {
+
+	#----------------------------------------------
+	#region Import the Assemblies
+	#----------------------------------------------
+	[void][reflection.assembly]::Load("mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
+	[void][reflection.assembly]::Load("System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
+	[void][reflection.assembly]::Load("System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
+	[void][reflection.assembly]::Load("System.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
+	[void][reflection.assembly]::Load("System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")
+	[void][reflection.assembly]::Load("System.Xml, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
+	[void][reflection.assembly]::Load("System.DirectoryServices, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")
+	[void][reflection.assembly]::Load("System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
+	[void][reflection.assembly]::Load("System.ServiceProcess, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")
+	#endregion Import Assemblies
+
+	#----------------------------------------------
+	#region Generated Form Objects
+	#----------------------------------------------
+	[System.Windows.Forms.Application]::EnableVisualStyles()
+	$Form = New-Object 'System.Windows.Forms.Form'
+	$labelTime = New-Object 'System.Windows.Forms.Label'
+	$Label2 = New-Object 'System.Windows.Forms.Label'
+	$Button1 = New-Object 'System.Windows.Forms.Button'
+	$Label1 = New-Object 'System.Windows.Forms.Label'
+	$InitialFormWindowState = New-Object 'System.Windows.Forms.FormWindowState'
+	#endregion Generated Form Objects
+
+	#----------------------------------------------
+	# User Generated Script
+	#----------------------------------------------
+	
+	
+	
+	
+	
+	
+	
+	Function Create-GetSchedTime {
+	Param(
+	$SchedTime
+	)
+	
+		
+	$script:StartTime = (Get-Date).AddSeconds($TotalTime)
+	$RestartDate = ((get-date).AddSeconds($TotalTime)).AddMinutes(-1)
+	$RDate = (Get-Date $RestartDate -f 'dd.MM.yyyy') -replace "\.","/"
+	$RTime = Get-Date $RestartDate -f 'HH:mm'
+	&schtasks /create /sc once /tn "Post Maintenance Restart" /tr "'C:\Windows\system32\cmd.exe' /c shutdown /r /t 4000" /SD $RDate /ST $RTime /f
+	}
+	
+	$timerUpdate = New-Object 'System.Windows.Forms.Timer'
+	$TotalTime = 3600
+	Create-GetSchedTime -SchedTime $TotalTime
+	$timerUpdate_Tick={
+	# Define countdown timer
+	[TimeSpan]$span = $script:StartTime - (Get-Date)
+	# Update the display
+	$hours = "{0:00}" -f $span.Hours
+	$mins = "{0:00}" -f $span.Minutes
+	$secs = "{0:00}" -f $span.Seconds
+	$labelTime.Text = "{0}:{1}:{2}" -f $hours, $mins, $secs
+	$timerUpdate.Start()
+		if ($span.TotalSeconds -le 0)
+		{
+			$timerUpdate.Stop()
+			&schtasks /delete /tn "Post Maintenance Restart" /f
+			shutdown /r /t 0
+		}
+	}
+
+
+$videoadapters = (Get-WmiObject -Class Win32_VideoController).VideoModeDescription;
+$primaryscreenres = $videoadapters | Select -first 1
+	
+	$Form_Load={
+		#TODO: Initialize Form Controls here
+			$timerUpdate.add_Tick($timerUpdate_Tick)
+		$timerUpdate.Start()
+		
+	}
+	$Button1_Click={
+		#TODO: Place custom script here
+		&schtasks /delete /tn "Post Maintenance Restart" /f
+		shutdown /r /t 0
+		$Form.Close()
+	}
+	
+	# --End User Generated Script--
+	#----------------------------------------------
+	#region Generated Events
+	#----------------------------------------------
+	
+	$Form_StateCorrection_Load=
+	{
+		#Correct the initial state of the form to prevent the .Net maximized form issue
+		$Form.WindowState = $InitialFormWindowState
+	}
+	
+	$Form_Cleanup_FormClosed=
+	{
+		#Remove all event handlers from the controls
+		try
+		{
+			$Button1.remove_Click($Button1_Click)
+			$Form.remove_Load($Form_Load)
+			$Form.remove_Load($Form_StateCorrection_Load)
+			$Form.remove_FormClosed($Form_Cleanup_FormClosed)
+		}
+		catch [Exception]
+		{ }
+	}
+
+
+
+
+
+if($primaryscreenres -like '*1920*')
+        {
+
+                        ############################################################################################################################################
+                        # Run 1920x1080 sized form
+                        ############################################################################################################################################
+
+	                        $Form.Controls.Add($labelTime)
+	                        $Form.Controls.Add($Label2)
+	                        $Form.Controls.Add($Button1)
+	                        $Form.Controls.Add($Label1)
+	                        $Form.AutoScaleDimensions = '96, 96'
+	                        $Form.AutoScaleMode = 'Dpi'
+	                        $Form.AutoScroll = $True
+	                        $Form.AutoScrollMargin = '10, 10'
+	                        $Form.AutoSize = $True
+	                        $Form.ClientSize = '686, 309'
+	                        $Form.Font = "Microsoft Sans Serif, 12pt"
+	                        $Form.FormBorderStyle = 'None'
+	                        $Form.MinimumSize = '600, 300'
+	                        $Form.Name = "Form"
+	                        $Form.Padding = '1, 1, 1, 1'
+	                        $Form.StartPosition = 'CenterScreen'
+	                        $Form.Text = "HBP Group: Reboot Required"
+	                        $Form.add_Load($Form_Load)
+	                        #
+	                        # labelTime
+	                        #
+	                        $labelTime.Dock = 'Top'
+	                        $labelTime.Font = "Tahoma, 40pt, style=Bold"
+	                        $labelTime.ForeColor = 'Red'
+	                        $labelTime.Location = '1, 147'
+	                        $labelTime.Margin = '10, 10, 10, 0'
+	                        $labelTime.Name = "labelTime"
+	                        $labelTime.Padding = '10, 10, 10, 10'
+	                        $labelTime.Size = '684, 85'
+	                        $labelTime.TabIndex = 5
+	                        $labelTime.Text = "00 : 00 : 00"
+	                        $labelTime.TextAlign = 'MiddleCenter'
+	                        #
+	                        # Label2
+	                        #
+	                        $Label2.Dock = 'Top'
+	                        $Label2.Font = "Tahoma, 12pt, style=Bold"
+	                        $Label2.ForeColor = 'Red'
+	                        $Label2.Location = '1, 93'
+	                        $Label2.Margin = '10, 10, 10, 0'
+	                        $Label2.Name = "Label2"
+	                        $Label2.Padding = '10, 10, 10, 10'
+	                        $Label2.Size = '684, 54'
+	                        $Label2.TabIndex = 4
+	                        $Label2.Text = "Please note: Closing this message will not stop the reboot."
+	                        $Label2.TextAlign = 'MiddleCenter'
+	                        #
+	                        # Button1
+	                        #
+	                        $Button1.AutoSize = $True
+	                        $Button1.Dock = 'Bottom'
+	                        $Button1.Location = '1, 253'
+	                        $Button1.Margin = '10, 10, 10, 10'
+	                        $Button1.Name = "Button1"
+	                        $Button1.Padding = '10, 10, 10, 10'
+	                        $Button1.Size = '684, 55'
+	                        $Button1.TabIndex = 2
+	                        $Button1.Text = "Reboot Now"
+	                        $Button1.UseVisualStyleBackColor = $True
+	                        $Button1.add_Click($Button1_Click)
+	                        #
+	                        # Label1
+	                        #
+	                        $Label1.Dock = 'Top'
+	                        $Label1.Font = "Tahoma, 12pt"
+	                        $Label1.Location = '1, 1'
+	                        $Label1.Margin = '10, 10, 10, 0'
+	                        $Label1.Name = "Label1"
+	                        $Label1.Padding = '10, 10, 10, 10'
+	                        $Label1.Size = '684, 92'
+	                        $Label1.TabIndex = 0
+	                        $Label1.Text = "Your computer has not been restarted in over 14 days. In order to keep your computer working at top performance it requires a restart. Please save all your work and make the appropriate selections below."
+	                        $Label1.TextAlign = 'MiddleCenter'
+
+
+
+
+        }
+if($primaryscreenres -like '*2160*')
+        {
+
+                                ############################################################################################################################################
+                                # Run 3200x21060 sized form
+                                ############################################################################################################################################
+
+	                        #----------------------------------------------
+	                        #region Generated Form Code
+	                        #----------------------------------------------
+	                        #
+	                        # Form
+	                        #
+	                        $Form.Controls.Add($labelTime)
+	                        $Form.Controls.Add($Label2)
+	                        $Form.Controls.Add($Button1)
+	                        $Form.Controls.Add($Label1)
+	                        $Form.AutoScaleDimensions = '96, 96'
+	                        $Form.AutoScaleMode = 'Dpi'
+	                        $Form.AutoScroll = $True
+	                        $Form.AutoScrollMargin = '10, 10'
+	                        $Form.AutoSize = $True
+	                        $Form.ClientSize = '1152, 876'
+	                        $Form.Font = "Microsoft Sans Serif, 12pt"
+	                        $Form.FormBorderStyle = 'None'
+	                        $Form.MinimumSize = '600, 300'
+	                        $Form.Name = "Form"
+	                        $Form.Padding = '1, 1, 1, 1'
+	                        $Form.StartPosition = 'CenterScreen'
+	                        $Form.Text = "HBP Group: Reboot Required"
+	                        $Form.add_Load($Form_Load)
+	                        #
+	                        # labelTime
+	                        #
+	                        $labelTime.Dock = 'Top'
+	                        $labelTime.Font = "Tahoma, 40pt, style=Bold"
+	                        $labelTime.ForeColor = 'Red'
+	                        $labelTime.Location = '1, 491'
+	                        $labelTime.Margin = '10, 10, 10, 0'
+	                        $labelTime.Name = "labelTime"
+	                        $labelTime.Padding = '10, 10, 10, 10'
+	                        $labelTime.Size = '1150, 252'
+	                        $labelTime.TabIndex = 5
+	                        $labelTime.Text = "00 : 00 : 00"
+	                        $labelTime.TextAlign = 'MiddleCenter'
+	                        #
+	                        # Label2
+	                        #
+	                        $Label2.Dock = 'Top'
+	                        $Label2.Font = "Tahoma, 12pt, style=Bold"
+	                        $Label2.ForeColor = 'Red'
+	                        $Label2.Location = '1, 327'
+	                        $Label2.Margin = '10, 10, 10, 0'
+	                        $Label2.Name = "Label2"
+	                        $Label2.Padding = '10, 10, 10, 10'
+	                        $Label2.Size = '1150, 164'
+	                        $Label2.TabIndex = 4
+	                        $Label2.Text = "Please note: Closing this message will not stop the reboot."
+	                        $Label2.TextAlign = 'MiddleCenter'
+	                        #
+	                        # Button1
+	                        #
+	                        $Button1.AutoSize = $True
+	                        $Button1.Dock = 'Bottom'
+	                        $Button1.Location = '1, 820'
+	                        $Button1.Margin = '10, 10, 10, 10'
+	                        $Button1.Name = "Button1"
+	                        $Button1.Padding = '10, 10, 10, 10'
+	                        $Button1.Size = '1150, 55'
+	                        $Button1.TabIndex = 2
+	                        $Button1.Text = "Reboot Now"
+	                        $Button1.UseVisualStyleBackColor = $True
+	                        $Button1.add_Click($Button1_Click)
+	                        #
+	                        # Label1
+	                        #
+	                        $Label1.Dock = 'Top'
+	                        $Label1.Font = "Tahoma, 12pt"
+	                        $Label1.Location = '1, 1'
+	                        $Label1.Margin = '10, 10, 10, 0'
+	                        $Label1.Name = "Label1"
+	                        $Label1.Padding = '10, 10, 10, 10'
+	                        $Label1.Size = '1150, 326'
+	                        $Label1.TabIndex = 0
+	                        $Label1.Text = "Your computer has not been restarted in over 14 days. In order to keep your computer working at top performance it requires a restart. Please save all your work and make the appropriate selections below."
+	                        $Label1.TextAlign = 'MiddleCenter'
+	                        #endregion Generated Form Code
+
+
+        }
+
+
+	#Save the initial state of the form
+	$InitialFormWindowState = $Form.WindowState
+	#Init the OnLoad event to correct the initial state of the form
+	$Form.add_Load($Form_StateCorrection_Load)
+	#Clean up the control events
+	$Form.add_FormClosed($Form_Cleanup_FormClosed)
+	#Show the Form
+	return $Form.ShowDialog()
+
+} #End Function
+
+#Call OnApplicationLoad to initialize
+if((OnApplicationLoad) -eq $true)
 {
-$timerUpdate.Stop()
-&schtasks /delete /tn "Post Maintenance Restart" /f
-shutdown /r /t 0
-}
-}
-$Form_StoreValues_Closing=
-{
-#Store the control values
+	#Call the form
+	Call-RebootWarning_pff | Out-Null
+	#Perform cleanup
+	OnApplicationExit
 }
 
-$Form_Cleanup_FormClosed=
-{
-#Remove all event handlers from the controls
-try
-{
-$Form.remove_Load($Form_Load)
-$timerUpdate.remove_Tick($timerUpdate_Tick)
-#$Form.remove_Load($Form_StateCorrection_Load)
-$Form.remove_Closing($Form_StoreValues_Closing)
-$Form.remove_FormClosed($Form_Cleanup_FormClosed)
-}
-catch [Exception]
-{ }
-}
-
-# Form
-$Form = New-Object -TypeName System.Windows.Forms.Form
-$Form.Text = $Title
-$Form.ClientSize = '584, 331'
-$Form.StartPosition = "CenterScreen"
-$Form.ControlBox = $False
-$Form.Topmost = $true
-$Form.KeyPreview = $true
-$Form.ShowInTaskbar = $Formalse
-$Form.FormBorderStyle = 'None'
-$Form.MaximizeBox = $Formalse
-$Form.MinimizeBox = $Formalse
-$Icon = [system.drawing.icon]::ExtractAssociatedIcon("c:\Windows\System32\UserAccountControlSettings.exe")
-$Form.Icon = $Icon
-
-# Button One (Reboot/Shutdown Now)
-$Button1 = New-Object -TypeName System.Windows.Forms.Button
-$Button1.Size = '551, 48'
-$Button1.Location = '12, 271'
-$Button1.Text = $Button1Text
-$Button1.Font = 'Tahoma, 10pt'
-$Button1.Add_Click({
-&schtasks /delete /tn "Post Maintenance Restart" /f
-shutdown /r /t 0
-$Form.Close()
-})
-$Form.Controls.Add($Button1)
-# Button Two (Postpone for 1 Hour)
-$Button2 = New-Object -TypeName System.Windows.Forms.Button
-$Button2.Size = New-Object -TypeName System.Drawing.Size(200,25)
-$Button2.Location = New-Object -TypeName System.Drawing.Size(210,300)
-$Button2.Text = $Button2Text
-$Button2.Font = 'Tahoma, 10pt'
-$Button2.Add_Click({
-$Button2.Enabled = $False
-$timerUpdate.Stop()
-$TotalTime = 14400
-Create-GetSchedTime -SchedTime $TotalTime
-$timerUpdate.add_Tick($timerUpdate_Tick)
-$timerUpdate.Start()
-})
-
-# Label
-$Label = New-Object -TypeName System.Windows.Forms.Label
-$Label.Size = '551, 78'
-$Label.Location = '12, 9'
-$Label.Text = $Message
-$label.Font = "Tahoma, 12pt"
-$label.TextAlign = 'MiddleCenter'
-$Form.Controls.Add($Label)
-
-# Label2
-$Label2 = New-Object -TypeName System.Windows.Forms.Label
-$Label2.Size = '551, 26'
-$Label2.Location = '12, 87'
-$Label2.Text = $Message2
-$label2.Font = "Tahoma, 12pt, style=Bold"
-$label2.TextAlign = 'MiddleCenter'
-$Label2.ForeColor = 'Red'
-$Form.Controls.Add($Label2)
-
-# labelTime
-$labelTime = New-Object 'System.Windows.Forms.Label'
-$labelTime.Font = "Tahoma, 72pt"
-$labelTime.Location = '12, 136'
-$labelTime.Name = 'labelTime'
-$labelTime.Size = '551, 123'
-$labelTime.TextAlign = 'MiddleCenter'
-$labelTime.ForeColor = 'Red'
-$Form.Controls.Add($labelTime)
-
-#Start the timer
-$timerUpdate.add_Tick($timerUpdate_Tick)
-$timerUpdate.Start()
-# Show
-$Form.Add_Shown({$Form.Activate()})
-#Clean up the control events
-$Form.add_FormClosed($Form_Cleanup_FormClosed)
-#Store the control values when form is closing
-$Form.add_Closing($Form_StoreValues_Closing)
-#Show the Form
-$Form.ShowDialog() | Out-Null
 }
